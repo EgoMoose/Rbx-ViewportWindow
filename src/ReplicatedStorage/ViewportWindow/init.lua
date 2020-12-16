@@ -11,6 +11,10 @@ local VEC_YZ = Vector3.new(0, 1, 1)
 local PI2 = math.pi / 2
 local Y_SPIN = CFrame.fromEulerAnglesXYZ(0, math.pi, 0)
 
+local PARENT_FOLDER = Instance.new("Folder")
+PARENT_FOLDER.Name = "ViewportWindows"
+PARENT_FOLDER.Parent = Players.LocalPlayer.PlayerGui
+
 local VPF = Instance.new("ViewportFrame")
 VPF.LightColor = Color3.new(0, 0, 0)
 VPF.Size = UDim2.new(1, 0, 1, 0)
@@ -60,7 +64,7 @@ function ViewportWindow.FromPart(part, normalId)
 	surfaceGui.SizingMode = Enum.SurfaceGuiSizingMode.FixedSize
 	surfaceGui.Adornee = part
 	surfaceGui.ClipsDescendants = true
-	surfaceGui.Parent = Players.LocalPlayer.PlayerGui
+	surfaceGui.Parent = PARENT_FOLDER
 
 	return ViewportWindow.new(surfaceGui)
 end
@@ -90,8 +94,6 @@ function ViewportWindow:GetSurface()
 end
 
 function ViewportWindow:Render(cameraCFrame, surfaceCFrame, surfaceSize)
-	
-
 	local camera = workspace.CurrentCamera
 
 	cameraCFrame = cameraCFrame or camera.CFrame
