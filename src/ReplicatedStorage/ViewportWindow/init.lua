@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 
 local Maid = require(script:WaitForChild("Maid"))
+local SkyboxModel = require(script:WaitForChild("SkyboxModel"))
 
 local UNIT_Y = Vector3.new(0, 1, 0)
 local VEC_XZ = Vector3.new(1, 0, 1)
@@ -11,9 +12,7 @@ local PI2 = math.pi / 2
 local Y_SPIN = CFrame.fromEulerAnglesXYZ(0, math.pi, 0)
 
 local VPF = Instance.new("ViewportFrame")
-VPF.ZIndex = 2
 VPF.LightColor = Color3.new(0, 0, 0)
-VPF.Name = "WorldFrame"
 VPF.Size = UDim2.new(1, 0, 1, 0)
 VPF.Position = UDim2.new(0, 0, 0, 0)
 VPF.AnchorPoint = Vector2.new(0, 0)
@@ -40,8 +39,16 @@ function ViewportWindow.new(surfaceGui)
 	self.Camera.Parent = surfaceGui
 
 	self.ViewportFrame = VPF:Clone()
+	self.ViewportFrame.Name = "WorldFrame"
+	self.ViewportFrame.ZIndex = 2
 	self.ViewportFrame.Parent = surfaceGui
 	self.ViewportFrame.CurrentCamera = self.Camera
+
+	self.SkyboxFrame = VPF:Clone()
+	self.SkyboxFrame.Name = "SkyboxFrame"
+	self.SkyboxFrame.ZIndex = 1
+	self.SkyboxFrame.Parent = surfaceGui
+	self.SkyboxFrame.CurrentCamera = self.Camera
 	
 	return self
 end
@@ -60,6 +67,13 @@ end
 
 -- Public Methods
 
+function ViewportWindow:AddSkybox(skybox)
+	if skybox and skybox:IsA("Sky") then
+		self.SkyboxFrame:ClearAllChildren()
+		SkyboxModel(skybox).Parent = self.SkyboxFrame
+	end
+end
+
 function ViewportWindow:GetSurface()
 	local part = self.SurfaceGui.Adornee
 	local partCF, partSize = part.CFrame, part.Size
@@ -76,6 +90,8 @@ function ViewportWindow:GetSurface()
 end
 
 function ViewportWindow:Render(cameraCFrame, surfaceCFrame, surfaceSize)
+	
+
 	local camera = workspace.CurrentCamera
 
 	cameraCFrame = cameraCFrame or camera.CFrame
