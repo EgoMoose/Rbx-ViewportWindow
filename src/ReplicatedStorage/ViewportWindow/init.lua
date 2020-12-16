@@ -3,6 +3,7 @@ local Lighting = game:GetService("Lighting")
 
 local Maid = require(script:WaitForChild("Maid"))
 local SkyboxModel = require(script:WaitForChild("SkyboxModel"))
+local ParallelClone = require(script:WaitForChild("ParallelClone"))
 
 local UNIT_Y = Vector3.new(0, 1, 0)
 local VEC_XZ = Vector3.new(1, 0, 1)
@@ -76,6 +77,14 @@ function ViewportWindow:AddSkybox(skybox)
 		self.SkyboxFrame:ClearAllChildren()
 		SkyboxModel(skybox).Parent = self.SkyboxFrame
 	end
+end
+
+function ViewportWindow:AddToWorld(children, cloneFunction, ignore)
+	ignore = ignore or {}
+	ignore[self.SurfaceGui.Adornee] = true
+	local lookup = {}
+	ParallelClone(children, cloneFunction, self.ViewportFrame, lookup, ignore)
+	return lookup
 end
 
 function ViewportWindow:GetSurface()
