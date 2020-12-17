@@ -11,6 +11,14 @@ local VEC_YZ = Vector3.new(0, 1, 1)
 local PI2 = math.pi / 2
 local Y_SPIN = CFrame.fromEulerAnglesXYZ(0, math.pi, 0)
 
+local INVALID_COPY = {
+	["Script"] = true,
+	["LocalScript"] = true,
+	["ModuleScript"] = true,
+	["Camera"] = true,
+	["Terrain"] = true,
+}
+
 local PARENT_FOLDER = Instance.new("Folder")
 PARENT_FOLDER.Name = "ViewportWindows"
 PARENT_FOLDER.Parent = Players.LocalPlayer.PlayerGui
@@ -76,6 +84,31 @@ function ViewportWindow:AddSkybox(skybox)
 		self.SkyboxFrame:ClearAllChildren()
 		SkyboxModel(skybox).Parent = self.SkyboxFrame
 	end
+end
+
+function ViewportWindow:CloneHierarchyToWorld(children, ignore, parent, matches)
+	parent = parent or self.WorldFrame
+	matches = matches or {}
+
+	for _, child in pairs(children) do
+		if not INVALID_COPY[child.ClassName] and not ignore[child] then
+			local archivable = child.Archivable
+			child.Archivable = true
+
+			local copy = child:Clone()
+			if copy then
+				copy:ClearAllChildren()
+				copy.Parent = parent
+
+				self:CloneHierarchyToWorld(child:GetChildren(), ignore, copy, matches)
+				matches[child] = copy
+			end
+
+			child.Archivable = archivable
+		end
+	end
+
+	return matches
 end
 
 function ViewportWindow:GetSurface()
