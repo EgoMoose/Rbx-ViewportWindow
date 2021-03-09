@@ -113,17 +113,18 @@ end
 
 function ViewportWindow:GetSurface()
 	local part = self.SurfaceGui.Adornee
-	local partCF, partSize = part.CFrame, part.Size
-	
-	local back = -Vector3.FromNormalId(self.SurfaceGui.Face)
-	local axis = (math.abs(back.y) == 1) and Vector3.new(back.y, 0, 0) or UNIT_Y
-	local right = CFrame.fromAxisAngle(axis, PI2) * back
-	local top = back:Cross(right).Unit
-	
-	local cf = partCF * CFrame.fromMatrix(-back*partSize/2, right, top, back)
-	local size = Vector3.new((partSize * right).Magnitude, (partSize * top).Magnitude, (partSize * back).Magnitude)
+	local partSize = part.Size
 
-	return cf, size
+	local v = -Vector3.FromNormalId(self.SurfaceGui.Face)
+	local u = Vector3.new(v.y, math.abs(v.x + v.z), 0)
+	local lcf = CFrame.fromMatrix(Vector3.new(), u:Cross(v), u, v)
+	local cf = part.CFrame * CFrame.new(-v * partSize/2) * lcf
+
+	return cf, Vector3.new(
+		math.abs(lcf.XVector:Dot(partSize)),
+		math.abs(lcf.YVector:Dot(partSize)),
+		math.abs(lcf.ZVector:Dot(partSize))
+	)
 end
 
 function ViewportWindow:Render(cameraCFrame, surfaceCFrame, surfaceSize)
